@@ -1,0 +1,33 @@
+{
+  "name": "odata-query-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "tslib": "^2.6.2"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/antwonthegreat/odata-query-builder.git"
+  },
+  "keywords": [
+    "odata",
+    "query",
+    "typescript"
+  ],
+  "author": "antwonthegreat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/antwonthegreat/odata-query-builder/issues"
+  },
+  "homepage": "https://github.com/antwonthegreat/odata-query-builder#readme",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ]
+}
