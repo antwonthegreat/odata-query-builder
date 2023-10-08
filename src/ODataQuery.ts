@@ -11,22 +11,37 @@ export class ODataQuery<Tobj>{
         select?:SelectKey<Tobj>[],
         expand?:Array<{prop:ExpandKey<Tobj>|ExpandManyKey<Tobj>,oData?: ODataQuery<Required<Tobj[ExpandKey<Tobj>|ExpandManyKey<Tobj>]>>}>,
         top?:number,
-        skip?:number
+        skip?:number,
+        filter?:string
+        count?:boolean
     } = {};
 
     public toString = (): string => {
         return [
-            `${this.parts.select ? `select=${this.parts.select.join(',')}`  : ''}`,
-            `${this.parts.expand ? 
+            this.parts.select ? `select=${this.parts.select.join(',')}`  : '',
+            ``,
+            this.parts.expand ? 
                 `expand=${this.parts.expand.map(o => o.oData ? `${o.prop.toString()}(${o.oData.toString()})` : o.prop).join(',')}`  
-                : ''}`,
-            `${this.parts.top ? `top=${this.parts.top}`  : ''}`,
-            `${this.parts.skip ? `skip=${this.parts.skip}`  : ''}`
+                : '',
+            this.parts.top ? `top=${this.parts.top}`  : '',
+            this.parts.skip ? `skip=${this.parts.skip}`  : '',
+            this.parts.filter ? `filter=${this.parts.filter}` : '',
+            this.parts.count ? 'count=true' :'',
         ].filter(o => o).join(this.innerQuery?  ';' :'&');
     }
 
     public select = (properties:(SelectKey<Tobj>)[]) => {
         this.parts.select = properties;
+        return this;
+    }
+
+    public count = (count:boolean = true) => {
+        this.parts.count = count;
+        return this;
+    }
+
+    public filter = (filter:string) => {
+        this.parts.filter = filter;
         return this;
     }
 
