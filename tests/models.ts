@@ -8,15 +8,15 @@ export interface User {
     Id: number;
     Name: string;
     Posts: Array<Post>;
-    Comments: Array<Comment>;
+    Comments: Array<Partial<Comment>>;
 }
 
 export interface Post {
     Id: number;
     Message: string;
-    Author: User;
+    Author: Partial<User>;
     AuthorId: number;
-    Comments: Array<Comment>;
+    Comments: Array<Partial<Comment>>;
 }
 
 export interface Comment {
@@ -24,6 +24,6 @@ export interface Comment {
     Message: string;
     Author: User;
     AuthorId: number;
-    Comment: Comment;
-    COmmentId: number;
+    Post: Post;
+    PostId: number;
 }

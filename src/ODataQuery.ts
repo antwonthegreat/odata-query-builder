@@ -31,26 +31,15 @@ export class ODataQuery<Tobj>{
     }
 
     public expand = <
-        CollectionName extends ExpandKey<Tobj> 
-    >(prop:CollectionName, innerOdataSelect?:(o:ODataQuery<Tobj[CollectionName]>)=>ODataQuery<Tobj[CollectionName]>)   => {
-        let innerOdata:ODataQuery<Tobj[CollectionName]>|null = null;
-        if(innerOdataSelect){
-            innerOdata = innerOdataSelect(new ODataQuery<Tobj[CollectionName]>);
+        ExpandedPropertyType extends ExpandKey<Tobj>|ExpandManyKey<Tobj>,
+        InnerQueryType extends ODataQuery<Required<Unarray<Tobj[ExpandedPropertyType]>>>
+    >(propertyName:ExpandedPropertyType, innerODataQuery?:(o:InnerQueryType)=>InnerQueryType) => {
+        let innerOdata:InnerQueryType|null = null;
+        if(innerODataQuery){
+            innerOdata = innerODataQuery(new ODataQuery<Required<Unarray<Tobj[ExpandedPropertyType]>>> as InnerQueryType);
             innerOdata.innerQuery = true;
         }
-        this.parts.expand = [...this.parts.expand ?? [],{prop, oData:innerOdata as any}];
-        return this;
-    }
-
-    public expandMany = <
-        CollectionName extends ExpandManyKey<Tobj> 
-    >(prop:CollectionName, innerOdataSelect?:(o:ODataQuery<Unarray<Tobj[CollectionName]>>)=>ODataQuery<Unarray<Tobj[CollectionName]>>)   => {
-        let innerOdata:ODataQuery<Unarray<Tobj[CollectionName]>>|null = null;
-        if(innerOdataSelect){
-            innerOdata = innerOdataSelect(new ODataQuery<Unarray<Tobj[CollectionName]>>);
-            innerOdata.innerQuery = true;
-        }
-        this.parts.expand = [...this.parts.expand ?? [],{prop, oData:innerOdata as any}];
+        this.parts.expand = [...this.parts.expand ?? [],{prop: propertyName, oData:innerOdata as any}];
         return this;
     }
 

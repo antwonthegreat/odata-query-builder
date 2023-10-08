@@ -17,9 +17,11 @@ describe('ODataQuery', () => {
   it("should use '&' to separate parts of outer query and ';' to separate parts of inner query" , () => {
     const query = new ODataQuery<Post>()
     .select(['AuthorId','Id'])
-    .expand('Author',o => o.select(['Name']).expand('Comments'));
+    .expand('Author',o => o.select(['Name']).expand('Comments',c=>c.select(['PostId'])))
+    .expand('Comments',o => o.select(['PostId']))
+    ;
 
-    expect(query.toString()).to.equal('select=AuthorId,Id&expand=Author(select=Name;expand=Comments)');
+    expect(query.toString()).to.equal('select=AuthorId,Id&expand=Author(select=Name;expand=Comments(select=PostId)),Comments(select=PostId)');
   });
 
 });
