@@ -17,6 +17,7 @@ export interface Post {
     Author: Partial<User>;
     AuthorId: number;
     Comments: Array<Partial<Comment>>;
+    IsPublished: boolean;
 }
 
 export interface Comment {

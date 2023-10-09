@@ -26,7 +26,7 @@ describe('ODataQuery', () => {
 
   it('should add raw filter string without modification' , () => {
     const query = new ODataQuery<Post>()
-    .filter('HiMom');
+    .rawFilter('HiMom');
 
     expect(query.toString()).to.equal('filter=HiMom');
   });
@@ -36,6 +36,65 @@ describe('ODataQuery', () => {
     .count();
 
     expect(query.toString()).to.equal('count=true');
+  });
+
+  it('filtering on a non existent property should be a compile error' , () => {
+    new ODataQuery<Post>()
+    // @ts-expect-error
+    .filter('IsPblished');
+  });
+
+  it('selecting a non existent property should be a compile error' , () => {
+    new ODataQuery<Post>()
+    // @ts-expect-error
+    .select('IsPblished');
+  });
+
+  it('expanding to a primitive property should be a compile error' , () => {
+    new ODataQuery<Post>()
+    // @ts-expect-error
+    .expand('IsPublished');
+  });
+
+  it('filter allows whitespace' , () => {
+    const query = new ODataQuery<Post>()
+    .filter(' IsPublished ')
+    ;
+
+    expect(query.toString()).to.equal('filter= IsPublished ');
+  });
+
+  it('should enforce filter rules' , () => {
+    new ODataQuery<Post>()
+    .filter('IsPublished')//bool
+    .filter("Message eq 'Welcome'")//string compare
+    .filter("IsPublished eq true")//explicit bool equality
+    .filter("Id eq 4")//number compare
+    .filter(" Id eq 4 ")//some whitespace allowed 
+    .filter('(Id eq 4)')//balanced parentheses allowed
+    .filter("not Message eq 'Welcome'")//not expression
+    .filter("Message eq 'Welcome' and Id eq 3")//and expression
+    .filter("Message eq 'Welcome' or Id eq 3")//or expression
+
+    // @ts-expect-error
+    .filter('Message')//bool
+    // @ts-expect-error
+    .filter("Id eq 'Welcome'")//string compare
+    // @ts-expect-error
+    .filter("Message eq true")//explicit bool equality
+    // @ts-expect-error
+    .filter("Message eq 4")//number compare
+    // @ts-expect-error
+    .filter("    Id eq 4 ")//some whitespace allowed 
+    // @ts-expect-error
+    .filter('Id eq 4)')//balanced parentheses allowed
+    // @ts-expect-error
+    .filter("not Message'")//not expression
+    // @ts-expect-error
+    .filter("Message eq 'Welcome' and ")//and expression
+    // @ts-expect-error
+    .filter("Message eq 'Welcome' or ")//or expression
+    ;
   });
 
 });
