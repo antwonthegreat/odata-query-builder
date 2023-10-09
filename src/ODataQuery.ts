@@ -31,7 +31,8 @@ export class ODataQuery<T>{
         top?:number,
         skip?:number,
         filter?:Array<string|FilterExpression<T>>,
-        count?:boolean
+        count?:boolean,
+        rawQueryParts?:Array<string>
     } = {};
 
     public toString = (): string => {
@@ -43,13 +44,19 @@ export class ODataQuery<T>{
                 : '',
             this.parts.top ? `top=${this.parts.top}`  : '',
             this.parts.skip ? `skip=${this.parts.skip}`  : '',
-            this.parts.filter ? `filter=${this.parts.filter.join(' and ')}` : '',
+            this.parts.filter ? `filter=${this.parts.filter.length > 1 ? '(' : ''}${this.parts.filter.join(') and (')}${this.parts.filter.length > 1 ? ')' : ''}` : '',
             this.parts.count ? 'count=true' :'',
+            this.parts.rawQueryParts?.join(this.innerQuery?  ';' :'&')
         ].filter(o => o).join(this.innerQuery?  ';' :'&');
     }
 
     public select = (properties:(SelectKey<T>)[]) => {
         this.parts.select = properties;
+        return this;
+    }
+
+    public rawQuery = (query:string) => {
+        this.parts.rawQueryParts = [...this.parts.rawQueryParts ?? [],query];
         return this;
     }
 

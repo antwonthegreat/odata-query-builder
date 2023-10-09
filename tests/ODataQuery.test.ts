@@ -97,4 +97,23 @@ describe('ODataQuery', () => {
     ;
   });
 
+  it('multiple filters combined with parentheses' , () => {
+    const query = new ODataQuery<Post>()
+    .filter('IsPublished')
+    .filter("Message eq 'Welcome'")
+    ;
+
+    expect(query.toString()).to.equal("filter=(IsPublished) and (Message eq 'Welcome')");
+  });
+
+  it('raw query parts should be combined with typed parts' , () => {
+    const query = new ODataQuery<Post>()
+    .expand('Author', o => o.select(['Name']).rawQuery('count=1').rawQuery('top=2'))
+    .filter(' IsPublished')
+    .rawQuery('top=1')
+    ;
+
+    expect(query.toString()).to.equal('expand=Author(select=Name;count=1;top=2)&filter= IsPublished&top=1');
+  });
+
 });
