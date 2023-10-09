@@ -1,14 +1,14 @@
 type KeysMatching<T, V> = {[K in keyof T]-?: T[K] extends V ? K : never}[keyof T];
-type SelectKey<T> = KeysMatching<T,string|number>;
-type ExpandKey<T> = KeysMatching<T,object>;
-type ExpandManyKey<T> = KeysMatching<T,Array<object>>;
+type SelectKey<T> = KeysMatching<T,string|number|null|undefined>;
+type ExpandKey<T> = KeysMatching<T,object|null|undefined>;
+type ExpandManyKey<T> = KeysMatching<T,Array<object|null|undefined>>;
 type Unarray<T> = T extends Array<infer U> ? U : T;
 
 type SimpleFilterExpression<T> = 
- `${Extract<KeysMatching<T, boolean>,string>}`| //boolean
- `${Extract<KeysMatching<T, string>,string>} ${'eq'|'ne'} '${string}'`|// string
- `${Extract<KeysMatching<T, boolean>,string>} eq ${'true'|'false'}`|//eq bool
- `${Extract<KeysMatching<T, number>,string>} ${'eq'|'ne'|'lt'|'le'|'gt'|'ge'} ${number}`// number
+ `${Extract<KeysMatching<T, boolean|null|undefined>,string>}`| //boolean
+ `${Extract<KeysMatching<T, string|null|undefined>,string>} ${'eq'|'ne'} '${string}'`|// string
+ `${Extract<KeysMatching<T, boolean|null|undefined>,string>} eq ${'true'|'false'}`|//eq bool
+ `${Extract<KeysMatching<T, number|null|undefined>,string>} ${'eq'|'ne'|'lt'|'le'|'gt'|'ge'} ${number}`// number
   ;
 
 type ExtractedSimpleFilterExpression<T> = Extract<SimpleFilterExpression<T>,string>;
@@ -86,11 +86,11 @@ export class ODataQuery<T>{
 
     public expand = <
         ExpandedPropertyType extends ExpandKey<T>|ExpandManyKey<T>,
-        InnerQueryType extends ODataQuery<Required<Unarray<T[ExpandedPropertyType]>>>
+        InnerQueryType extends ODataQuery<Required<Exclude<Unarray<T[ExpandedPropertyType]>,null|undefined>>>
     >(propertyName:ExpandedPropertyType, innerODataQuery?:(o:InnerQueryType)=>InnerQueryType) => {
         let innerOdata:InnerQueryType|null = null;
         if(innerODataQuery){
-            innerOdata = innerODataQuery(new ODataQuery<Required<Unarray<T[ExpandedPropertyType]>>> as InnerQueryType);
+            innerOdata = innerODataQuery(new ODataQuery<Required<Exclude<Unarray<T[ExpandedPropertyType]>, null|undefined>>> as InnerQueryType);
             innerOdata.innerQuery = true;
         }
         this.parts.expand = [...this.parts.expand ?? [],{prop: propertyName, oData:innerOdata as any}];

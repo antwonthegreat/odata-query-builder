@@ -14,6 +14,13 @@ describe('ODataQuery', () => {
     expect(query.toString()).to.equal('select=AuthorId,Id');
   });
 
+  it('should allow selecting nullable and undefined properties' , () => {
+    new ODataQuery<Post>()
+    .select(['Message'])
+    .select(['NullableMessage'])
+    .select(['UndefinedMessage']);
+  });
+
   it("should use '&' to separate parts of outer query and ';' to separate parts of inner query" , () => {
     const query = new ODataQuery<Post>()
     .select(['AuthorId','Id'])
@@ -59,6 +66,19 @@ describe('ODataQuery', () => {
     .select('IsPblished');
   });
 
+  it('should not allow expanding to primitive objects' , () => {
+    new ODataQuery<Post>()
+    // @ts-expect-error
+    .expand('Note');
+  });
+
+  it('should allow expanding to nullable and undefined objects' , () => {
+    new ODataQuery<Post>()
+    .expand('NullableAuthor',o => o.select(['Name']).expand('Comments',c=>c.select(['PostId'])))
+    .expand('Author',o => o.select(['Name']).expand('Comments',c=>c.select(['PostId'])))
+    .expand('UndefinedAuthor',o => o.select(['Name']).expand('Comments',c=>c.select(['PostId'])));
+  });
+
   it('expanding to a primitive property should be a compile error' , () => {
     new ODataQuery<Post>()
     // @ts-expect-error
@@ -71,6 +91,14 @@ describe('ODataQuery', () => {
     ;
 
     expect(query.toString()).to.equal('filter= IsPublished ');
+  });
+
+  it('should allow filtering on nullable and undefined properties' , () => {
+    new ODataQuery<Post>()
+    .filter(" NullableMessage eq 'Hi' ")
+    .filter(" Message eq 'Hi' ")
+    .filter(" UndefinedMessage eq 'Hi' ")
+    ;
   });
 
   it('should enforce filter rules' , () => {

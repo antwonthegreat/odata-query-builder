@@ -14,9 +14,14 @@ export interface User {
 export interface Post {
     Id: number;
     Message: string;
+    NullableMessage: string|null;
+    UndefinedMessage?: string;
+
     Author: Partial<User>;
+    NullableAuthor: Partial<User>|null;
+    UndefinedAuthor?: Partial<User>;
     AuthorId: number;
-    Comments: Array<Partial<Comment>>;
+    Comments?: Array<Partial<Comment>>;
     IsPublished: boolean;
 }
 
