@@ -38,6 +38,15 @@ describe('ODataQuery', () => {
     expect(query.toString()).to.equal('count=true');
   });
 
+  it('should add orderbys to querystring' , () => {
+    const query = new ODataQuery<Post>()
+    .orderBy('Message','asc')
+    .orderBy('Id')
+    .orderBy('AuthorId','desc');
+
+    expect(query.toString()).to.equal('orderBy=Message asc,Id,AuthorId desc');
+  });
+
   it('filtering on a non existent property should be a compile error' , () => {
     new ODataQuery<Post>()
     // @ts-expect-error

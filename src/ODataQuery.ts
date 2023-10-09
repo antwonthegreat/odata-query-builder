@@ -32,6 +32,7 @@ export class ODataQuery<T>{
         skip?:number,
         filter?:Array<string|FilterExpression<T>>,
         count?:boolean,
+        orderBy?:Array<{prop:SelectKey<T>,direction?:'asc'|'desc'}>,
         rawQueryParts?:Array<string>
     } = {};
 
@@ -46,6 +47,9 @@ export class ODataQuery<T>{
             this.parts.skip ? `skip=${this.parts.skip}`  : '',
             this.parts.filter ? `filter=${this.parts.filter.length > 1 ? '(' : ''}${this.parts.filter.join(') and (')}${this.parts.filter.length > 1 ? ')' : ''}` : '',
             this.parts.count ? 'count=true' :'',
+            this.parts.orderBy ? 
+                `orderBy=${this.parts.orderBy.map(o => `${o.prop.toString()}${o.direction ? ` ${o.direction}` : ''}`).join(',')}`  
+                : '',
             this.parts.rawQueryParts?.join(this.innerQuery?  ';' :'&')
         ].filter(o => o).join(this.innerQuery?  ';' :'&');
     }
@@ -65,6 +69,10 @@ export class ODataQuery<T>{
         return this;
     }
 
+    public orderBy = (propertyName:SelectKey<T>, direction?:'asc'|'desc') => {        
+        this.parts.orderBy = [...this.parts.orderBy ?? [],{prop: propertyName, direction}];
+        return this;
+    }
 
     public filter = (filter:FilterExpression<T>) => {
         this.parts.filter = [...this.parts.filter ?? [], filter];
