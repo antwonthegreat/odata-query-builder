@@ -1,1 +1,1 @@
-export {ODataQuery} from './ODataQuery'
+export { ODataQuery } from "./ODataQuery";
