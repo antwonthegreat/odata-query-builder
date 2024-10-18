@@ -1,7 +1,7 @@
 import { ODataQuery } from "../src/index";
 
 import * as chai from "chai";
-import { Post, Comment } from "./models";
+import { Post } from "./models";
 
 const expect = chai.expect;
 describe("ODataQuery", () => {
@@ -14,6 +14,9 @@ describe("ODataQuery", () => {
       .select(["Message"])
       .select(["NullableMessage"])
       .select(["UndefinedMessage"]);
+  });
+  it("should allow selecting complex properties", () => {
+    new ODataQuery<Post>().select(["Author"]);
   });
   it("should use '&' to separate parts of outer query and ';' to separate parts of inner query", () => {
     const query = new ODataQuery<Post>()
