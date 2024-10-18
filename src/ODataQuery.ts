@@ -3,7 +3,7 @@ type KeysMatching<T, V> = {
 }[keyof T];
 type SelectKey<T> = KeysMatching<
   T,
-  string | number | null | boolean | undefined
+  string | number | null | boolean | undefined | object
 >;
 type ExpandKey<T> = KeysMatching<T, object | null | undefined>;
 type ExpandManyKey<T> = KeysMatching<T, Array<object | null | undefined>>;
