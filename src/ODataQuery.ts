@@ -23,7 +23,8 @@ type SimpleFilterExpression<T> =
       | "lt"
       | "le"
       | "gt"
-      | "ge"} ${number}`; // number
+      | "ge"} ${number}` // number
+  | `isof('${string}')`; //isof
 
 // type DeepFilterExpression<T> = `${Extract<
 //   ExpandKey<T>,
