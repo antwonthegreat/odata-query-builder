@@ -115,6 +115,7 @@ describe("ODataQuery", () => {
       .filter("IsPublished") //bool
       .filter("Message eq 'Welcome'") //string compare
       .filter("IsPublished eq true") //explicit bool equality
+      .filter("isof('Namespace.Type')") //isof expression
       .filter("Id eq 4") //number compare
       .filter(" Id eq 4 ") //some whitespace allowed
       .filter("(Id eq 4)") //balanced parentheses allowed
