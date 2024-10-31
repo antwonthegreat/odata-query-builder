@@ -14,6 +14,7 @@ describe("ODataQuery", () => {
       .select(["Message"])
       .select(["NullableMessage"])
       .select(["UndefinedMessage"]);
+      .selectString("Message, NullableMessage, UndefinedMessage");
   });
   it("should allow selecting complex properties", () => {
     new ODataQuery<Post>().select(["Author"]);

@@ -75,6 +75,31 @@ type FilterExpression<T> =
   | `${SimpleOrDeepFilterExpression<T>} and ${SimpleOrDeepFilterExpression<T>}` //and
   | `${SimpleOrDeepFilterExpression<T>} or ${SimpleOrDeepFilterExpression<T>}`; //or
 
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I
+) => void
+  ? I
+  : never;
+type UnionToOvlds<U> = UnionToIntersection<
+  U extends any ? (f: U) => void : never
+>;
+
+type PopUnion<U> = UnionToOvlds<U> extends (a: infer A) => void ? A : never;
+
+type UnionConcat<
+  U extends string | number | symbol,
+  Sep extends string
+> = PopUnion<U> extends infer SELF
+  ? SELF extends string
+    ? Exclude<U, SELF> extends never
+      ? SELF
+      :
+          | `${UnionConcat<Exclude<U, SELF>, Sep>}${Sep}${SELF}`
+          | UnionConcat<Exclude<U, SELF>, Sep>
+          | SELF
+    : never
+  : never;
+
 export class ODataQuery<T extends object> {
   innerQuery: boolean = false;
   parts: {
@@ -130,6 +155,13 @@ export class ODataQuery<T extends object> {
 
   public select = (properties: SelectKey<T>[]) => {
     this.parts.select = properties;
+    return this;
+  };
+
+  public selectString = (properties: UnionConcat<SelectKey<T>, ", ">) => {
+    this.parts.select = (properties as string)
+      .replace(" ", "")
+      .split(",") as SelectKey<T>[];
     return this;
   };
 
