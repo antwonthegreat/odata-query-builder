@@ -88,6 +88,7 @@ export class ODataQuery<T extends object> {
     filter?: Array<string | FilterExpression<T>>;
     count?: boolean;
     orderBy?: Array<{ prop: SelectKey<T>; direction?: "asc" | "desc" }>;
+    compute?: string;
     rawQueryParts?: Array<string>;
   } = {};
 
@@ -120,6 +121,7 @@ export class ODataQuery<T extends object> {
             )
             .join(",")}`
         : "",
+      this.parts.compute ? `compute=${this.parts.compute}` : "",
       this.parts.rawQueryParts?.join(this.innerQuery ? ";" : "&"),
     ]
       .filter((o) => o)
