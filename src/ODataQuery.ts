@@ -67,14 +67,6 @@ type SimpleFilterExpression<T> =
 type SimpleOrDeepFilterExpression<T> = SimpleFilterExpression<T>;
 // | DeepFilterProperty<T, KeysMatching<T, any>>
 
-type FilterExpression<T> =
-  | SimpleOrDeepFilterExpression<T>
-  | `${"" | " "}${SimpleOrDeepFilterExpression<T>}${"" | " "}` //allow spaces
-  | `(${SimpleOrDeepFilterExpression<T>})` //balanced parentheses
-  | `not ${SimpleOrDeepFilterExpression<T>}` //not
-  | `${SimpleOrDeepFilterExpression<T>} and ${SimpleOrDeepFilterExpression<T>}` //and
-  | `${SimpleOrDeepFilterExpression<T>} or ${SimpleOrDeepFilterExpression<T>}`; //or
-
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I
 ) => void
@@ -99,6 +91,15 @@ type UnionConcat<
           | SELF
     : never
   : never;
+
+type FilterExpression<T> =
+  | SimpleOrDeepFilterExpression<T>
+  | `${"" | " "}${SimpleOrDeepFilterExpression<T>}${"" | " "}` //allow spaces
+  | `(${SimpleOrDeepFilterExpression<T>})` //balanced parentheses
+  | `not ${SimpleOrDeepFilterExpression<T>}` //not
+  | `${SimpleOrDeepFilterExpression<T>} and ${SimpleOrDeepFilterExpression<T>}` //and
+  //| `${UnionConcat<SimpleOrDeepFilterExpression<T>, " and ">}`
+  | `${SimpleOrDeepFilterExpression<T>} or ${SimpleOrDeepFilterExpression<T>}`; //or
 
 export class ODataQuery<T extends object> {
   innerQuery: boolean = false;
@@ -128,8 +129,8 @@ export class ODataQuery<T extends object> {
             )
             .join(",")}`
         : "",
-      this.parts.top ? `top=${this.parts.top}` : "",
-      this.parts.skip ? `skip=${this.parts.skip}` : "",
+      this.parts.top !== undefined ? `top=${this.parts.top}` : "",
+      this.parts.skip !== undefined ? `skip=${this.parts.skip}` : "",
       this.parts.filter
         ? `filter=${
             this.parts.filter.length > 1 ? "(" : ""
