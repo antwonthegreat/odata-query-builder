@@ -121,6 +121,7 @@ describe("ODataQuery", () => {
       .filter(" Id eq 4 ") //some whitespace allowed
       .filter("(Id eq 4)") //balanced parentheses allowed
       .filter("not Message eq 'Welcome'") //not expression
+      .filter("contains(Message, 'Welcome')") //contains expression
       //.filter("not Message eq 'Welcome' and Id eq 4") //not expression in complex filter
       .filter("Message eq 'Welcome' and Id eq 3 ") //and expression
       //.filter("Message eq 'Welcome' and Id eq 3 and IsPublished") //multiple ands

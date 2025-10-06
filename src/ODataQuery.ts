@@ -24,7 +24,10 @@ type SimpleFilterExpression<T> =
       | "le"
       | "gt"
       | "ge"} ${number}` // number
-  | `isof('${string}')`; //isof
+  | `isof('${string}')` //isof
+  | `contains(${Extract<KeysMatching<T, string | null | undefined>, string>}${
+      | " "
+      | ""},${string})`;
 
 // type DeepFilterExpression<T> = `${Extract<
 //   ExpandKey<T>,
