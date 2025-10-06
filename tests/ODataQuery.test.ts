@@ -13,7 +13,7 @@ describe("ODataQuery", () => {
     new ODataQuery<Post>()
       .select(["Message"])
       .select(["NullableMessage"])
-      .select(["UndefinedMessage"]);
+      .select(["UndefinedMessage"])
       .selectString("Message, NullableMessage, UndefinedMessage");
   });
   it("should allow selecting complex properties", () => {
@@ -121,7 +121,9 @@ describe("ODataQuery", () => {
       .filter(" Id eq 4 ") //some whitespace allowed
       .filter("(Id eq 4)") //balanced parentheses allowed
       .filter("not Message eq 'Welcome'") //not expression
-      .filter("Message eq 'Welcome' and Id eq 3") //and expression
+      //.filter("not Message eq 'Welcome' and Id eq 4") //not expression in complex filter
+      .filter("Message eq 'Welcome' and Id eq 3 ") //and expression
+      //.filter("Message eq 'Welcome' and Id eq 3 and IsPublished") //multiple ands
       .filter("Message eq 'Welcome' or Id eq 3") //or expression
       // @ts-expect-error
       .filter("Id eq 'Welcome'") //string compare
@@ -160,6 +162,41 @@ describe("ODataQuery", () => {
     expect(query.toString()).to.equal(
       "expand=Author(select=Name;count=1;top=2)&filter= IsPublished&top=1"
     );
+  });
+
+  it("example test", () => {
+    const odataParts = [
+      "expand=Comments(select=Message),Author(select=Name,Id,NullableBio;expand=Posts(select=IsPublished,Message;orderBy=Message desc)),NullableAuthor(select=Name),UndefinedAuthor(select=Comments,Name, IsVerified)",
+      "top=10",
+      "skip=0",
+      "filter=not IsPublished",
+      "count=true",
+      "orderBy=Message desc",
+      //"compute=Author/Id%20gt%2010%20as%20NewAuthor",
+    ];
+
+    const query = new ODataQuery<Post>()
+      .top(10)
+      .orderBy("Message", "desc")
+      .skip(0)
+      .count()
+      .expand("Comments", (o) => o.select(["Message"]))
+      .expand("Author", (o) =>
+        o.select(["Name", "Id", "NullableBio"]).expand("Posts", (r) =>
+          r
+            // .filter(
+            //   "(not IsPublished and isof('com.namespace')) or ((Message eq null or Id gt 3) and isof('com.namespace2') or (Author/IsVerified and contains(toLower(Author/Name) ,toLower('the')))"
+            // )
+            .orderBy("Message", "desc")
+            .select(["IsPublished", "Message"])
+        )
+      )
+      .expand("NullableAuthor", (o) => o.select(["Name"]))
+      .expand("UndefinedAuthor", (o) =>
+        o.selectString("Comments, Name, IsVerified")
+      )
+      .filter("not IsPublished");
+    expect(query.toString()).to.equal(odataParts.join("&"));
   });
 
   // it("pick", () => {
