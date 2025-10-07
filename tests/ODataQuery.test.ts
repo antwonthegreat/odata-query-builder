@@ -153,6 +153,27 @@ describe("ODataQuery", () => {
       "filter=(IsPublished) and (Message eq 'Welcome')"
     );
   });
+
+  it("and filters", () => {
+    const query = new ODataQuery<Post>().filters([
+      "IsPublished",
+      "Message eq 'Welcome'",
+    ]);
+    expect(query.toString()).to.equal(
+      "filter=(IsPublished) and (Message eq 'Welcome')"
+    );
+  });
+
+  it("or filters", () => {
+    const query = new ODataQuery<Post>().filters(
+      ["IsPublished", "Message eq 'Welcome'"],
+      "or"
+    );
+    expect(query.toString()).to.equal(
+      "filter=IsPublished or Message eq 'Welcome'"
+    );
+  });
+
   it("raw query parts should be combined with typed parts", () => {
     const query = new ODataQuery<Post>()
       .expand("Author", (o) =>
