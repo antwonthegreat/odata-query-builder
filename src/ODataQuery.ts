@@ -192,6 +192,15 @@ export class ODataQuery<T extends object> {
     return this;
   };
 
+  public filters = (
+    filters: FilterExpression<T>[],
+    operator: "and" | "or" = "and"
+  ) => {
+    const f = operator === "and" ? [...filters] : [filters.join(" or ")];
+    this.parts.filter = [...(this.parts.filter ?? []), ...f];
+    return this;
+  };
+
   // public test = (filter: DeepFilterProperty<T, KeysMatching<T, any>>) => {
   //   this.parts.filter = [...(this.parts.filter ?? []), filter];
   //   return this;
